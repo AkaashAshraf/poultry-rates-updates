@@ -1,0 +1,32 @@
+import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../core/constants/app_constants.dart';
+
+class ThemeProvider extends ChangeNotifier {
+  ThemeMode _mode = ThemeMode.system;
+  ThemeMode get mode => _mode;
+
+  ThemeProvider() {
+    _load();
+  }
+
+  Future<void> _load() async {
+    final prefs = await SharedPreferences.getInstance();
+    final saved = prefs.getString(AppConstants.prefsThemeKey);
+    if (saved == 'light') {
+      _mode = ThemeMode.light;
+    } else if (saved == 'dark') {
+      _mode = ThemeMode.dark;
+    } else {
+      _mode = ThemeMode.system;
+    }
+    notifyListeners();
+  }
+
+  Future<void> setMode(ThemeMode mode) async {
+    _mode = mode;
+    notifyListeners();
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(AppConstants.prefsThemeKey, mode.name);
+  }
+}

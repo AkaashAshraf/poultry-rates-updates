@@ -1,0 +1,56 @@
+name: poultry_rates_app
+description: "Daily poultry rates (chicken, meat, eggs) by city — with an admin panel and bilingual (English/Urdu) support."
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  # Pinned to match the Flutter version fixed in .fvmrc (3.44.7, which
+  # bundles Dart 3.12). Run `fvm use` before `fvm flutter pub get` so the
+  # SDK actually on disk matches these constraints.
+  sdk: '>=3.12.0 <4.0.0'
+  flutter: '>=3.44.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  cupertino_icons: ^1.0.8
+
+  # Firebase
+  firebase_core: ^3.6.0
+  firebase_auth: ^5.3.1
+  cloud_firestore: ^5.4.4
+
+  # State management
+  provider: ^6.1.2
+
+  # Navigation
+  go_router: ^14.2.7
+
+  # Localization (English / Urdu)
+  easy_localization: ^3.0.7
+  # Must match the version flutter_localizations pins for this Flutter SDK
+  # (3.44.7 pins intl 0.20.2) — see https://dart.dev/go/sdk-version-pinning
+  intl: ^0.20.2
+
+  # UI / Fonts / Charts
+  google_fonts: ^6.2.1
+  fl_chart: ^0.69.0
+  shimmer: ^3.0.0
+  cached_network_image: ^3.4.1
+
+  # Utilities
+  shared_preferences: ^2.3.2
+  intl_phone_field: ^3.2.0
+  package_info_plus: ^8.1.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/translations/

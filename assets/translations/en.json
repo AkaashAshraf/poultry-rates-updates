@@ -1,0 +1,124 @@
+{
+  "app": {
+    "name": "Poultry Rates",
+    "tagline": "Fresh rates, every city, every day"
+  },
+  "auth": {
+    "adminLoginTitle": "Admin Login",
+    "adminLoginSubtitle": "Enter your registered phone number to receive a one-time verification code.",
+    "adminOnlyNotice": "Only phone numbers pre-approved by the app owner can access the admin panel.",
+    "phoneNumber": "Phone number",
+    "sendCode": "Send Code",
+    "enterValidPhone": "Please enter a valid phone number",
+    "otpFailed": "Could not send the verification code. Please try again.",
+    "verifyTitle": "Verify Your Number",
+    "verifySubtitle": "Enter the 6-digit code sent to {}",
+    "verify": "Verify & Continue",
+    "enterFullCode": "Please enter the full 6-digit code",
+    "invalidCode": "That code isn't right. Please try again.",
+    "notAuthorized": "This phone number is not authorized for admin access.",
+    "resendIn": "Resend code in {}s",
+    "resendCode": "Resend Code"
+  },
+  "category": {
+    "chicken": "Chicken",
+    "meat": "Meat",
+    "egg": "Eggs"
+  },
+  "unit": {
+    "perKg": "per kg",
+    "perDozen": "per dozen"
+  },
+  "common": {
+    "allCities": "All Cities",
+    "cancel": "Cancel",
+    "city": "City",
+    "delete": "Delete",
+    "edit": "Edit",
+    "save": "Save"
+  },
+  "nav": {
+    "feed": "Feed",
+    "rates": "Rates",
+    "graphs": "Graphs",
+    "settings": "Settings"
+  },
+  "feed": {
+    "title": "News Feed",
+    "emptyTitle": "No news yet",
+    "emptySubtitle": "Check back soon for the latest poultry market updates."
+  },
+  "rates": {
+    "title": "Today's Rates",
+    "add": "Add Rate",
+    "addTitle": "Add Rate",
+    "updateTitle": "Update Rate",
+    "price": "Price",
+    "unit": "Unit",
+    "deleteTitle": "Delete this rate?",
+    "deleteMessage": "This entry will be permanently removed from the price history.",
+    "emptyTitle": "No rates yet",
+    "emptySubtitle": "Rates added by the admin will show up here.",
+    "manageTitle": "Manage Rates"
+  },
+  "graphs": {
+    "title": "Price Trends",
+    "noCity": "Add a city to see price trends.",
+    "notEnoughData": "Not enough data yet",
+    "notEnoughDataSubtitle": "Once there are at least two price entries for this city and category, a trend chart will appear here."
+  },
+  "settings": {
+    "title": "Settings",
+    "language": "Language",
+    "appearance": "Appearance",
+    "systemDefault": "System default",
+    "light": "Light",
+    "dark": "Dark",
+    "administration": "Administration",
+    "loginAsAdmin": "Login as Admin",
+    "loginAsAdminSubtitle": "Manage cities, rates and view app users",
+    "about": "About",
+    "appVersion": "App version"
+  },
+  "admin": {
+    "dashboard": "Dashboard",
+    "cities": "Cities",
+    "rates": "Rates",
+    "users": "Users",
+    "backToApp": "Back to app",
+    "logout": "Logout",
+    "logoutTitle": "Logout of Admin?",
+    "logoutMessage": "You'll need to verify your phone number again to access the admin panel."
+  },
+  "cities": {
+    "add": "Add City",
+    "addTitle": "Add City",
+    "editTitle": "Edit City",
+    "nameEnglish": "Name (English)",
+    "nameUrdu": "Name (Urdu)",
+    "active": "Active",
+    "inactive": "Inactive",
+    "deleteTitle": "Delete this city?",
+    "deleteMessage": "Rates linked to this city will remain in history, but it will no longer appear in the app.",
+    "emptyTitle": "No cities yet",
+    "emptySubtitle": "Add your first city to start publishing rates."
+  },
+  "dashboard": {
+    "noCitiesTitle": "No cities yet",
+    "noCitiesSubtitle": "Add a city from the Cities tab to start publishing today's rates.",
+    "noRateYet": "Not set"
+  },
+  "users": {
+    "totalUsers": "Total Users",
+    "totalAdmins": "Admins",
+    "admin": "Admin",
+    "guestUser": "Guest user",
+    "lastActive": "Last active {}",
+    "emptyTitle": "No users yet",
+    "emptySubtitle": "Once people open the app, they'll show up here."
+  },
+  "validation": {
+    "required": "This field is required",
+    "enterValidPrice": "Enter a valid price"
+  }
+}

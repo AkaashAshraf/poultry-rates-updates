@@ -1,0 +1,56 @@
+rules_version = '2';
+
+// Security model
+// ---------------
+// - cities / rates / news: publicly readable (the whole point of the app
+//   is that anyone can see rates without logging in). Writable only by a
+//   signed-in user whose phone number is on the `admins` allow-list.
+// - admins: readable by any signed-in user (needed for the app to check
+//   "is this phone number an admin" right after OTP verification).
+//   Writable only from the Firebase console / Admin SDK — never from the
+//   client — so a compromised device can never grant itself admin rights.
+// - users: each visitor may create/update only their own document; the
+//   whole collection is readable by any admin (checked via the allow-list)
+//   so the admin "Users" screen can list everyone.
+
+function isSignedIn() {
+  return request.auth != null;
+}
+
+function isAdmin() {
+  return isSignedIn()
+    && request.auth.token.phone_number != null
+    && exists(/databases/$(database)/documents/admins/$(request.auth.token.phone_number));
+}
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    match /cities/{cityId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /rates/{rateId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /news/{newsId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /admins/{phoneNumber} {
+      allow read: if isSignedIn();
+      allow write: if false; // manage from the Firebase console only
+    }
+
+    match /users/{uid} {
+      allow read: if isAdmin();
+      allow create: if isSignedIn() && request.auth.uid == uid;
+      allow update: if isSignedIn() && request.auth.uid == uid;
+      allow delete: if false;
+    }
+  }
+}

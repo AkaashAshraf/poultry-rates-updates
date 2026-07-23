@@ -1,0 +1,20 @@
+include: package:flutter_lints/flutter.yaml
+
+linter:
+  rules:
+    prefer_const_constructors: true
+    prefer_const_literals_to_create_immutables: true
+    avoid_print: true
+
+analyzer:
+  exclude:
+    - "**/*.g.dart"
+    # build/ holds compiled output plus vendored third-party source (e.g.
+    # build/ios/SourcePackages/checkouts/flutterfire, which Xcode checks
+    # out via Swift Package Manager once Firebase is wired in). None of it
+    # is part of this app, it's regenerated on every clean build, and it
+    # isn't even guaranteed to be valid against *our* pubspec — so it must
+    # never be analyzed.
+    - "build/**"
+    - ".dart_tool/**"
+    - ".fvm/**"
