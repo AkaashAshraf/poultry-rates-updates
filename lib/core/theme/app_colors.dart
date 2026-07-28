@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-/// Central brand palette for the Poultry Rates app.
+/// Central brand palette for the Poultry Hub app.
 ///
 /// Palette story: a fresh agricultural teal/green as the primary brand color
 /// (trust, freshness) paired with a warm amber accent (energy, eggs/chicken)

@@ -18,6 +18,18 @@ class AppFormatters {
     return formatter.format(date);
   }
 
+  /// "Today" / "Yesterday" for the last two calendar days, otherwise a
+  /// formatted date — used as day-group headers in the rate history feed.
+  static String dayLabel(DateTime input, String languageCode) {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final day = DateTime(input.year, input.month, input.day);
+    final diff = today.difference(day).inDays;
+    if (diff == 0) return languageCode == 'ur' ? 'آج' : 'Today';
+    if (diff == 1) return languageCode == 'ur' ? 'کل' : 'Yesterday';
+    return AppFormatters.date(day, languageCode);
+  }
+
   static String timeAgo(DateTime date) {
     final diff = DateTime.now().difference(date);
     if (diff.inMinutes < 1) return 'now';

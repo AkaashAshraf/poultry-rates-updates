@@ -16,6 +16,7 @@ android/.gradle/
 android/local.properties
 android/app/google-services.json
 android/key.properties
+android/app/keystore/
 **/android/**/GeneratedPluginRegistrant.java
 
 # iOS
@@ -35,3 +36,9 @@ ios/ServiceDefinitions.json
 
 # FVM Version Cache
 .fvm/
+
+# Cloud Functions
+functions/node_modules/
+firebase-debug.log
+firebase-debug.*.log
+.firebase/

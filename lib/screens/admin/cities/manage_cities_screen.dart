@@ -18,6 +18,7 @@ class ManageCitiesScreen extends StatelessWidget {
 
     return Scaffold(
       floatingActionButton: FloatingActionButton.extended(
+        heroTag: 'manageCitiesFab',
         onPressed: () => showCityFormSheet(context),
         icon: const Icon(Icons.add),
         label: Text('cities.add'.tr()),

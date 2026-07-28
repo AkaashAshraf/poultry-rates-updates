@@ -7,7 +7,11 @@ import 'package:provider/provider.dart';
 import '../../../core/routing/app_router.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../providers/auth_provider.dart';
+import '../../../providers/cities_provider.dart';
+import '../../../providers/city_preferences_provider.dart';
 import '../../../providers/theme_provider.dart';
+import '../../../widgets/mode_toggle.dart';
+import 'city_selection_screen.dart';
 
 class UserSettingsScreen extends StatelessWidget {
   const UserSettingsScreen({super.key});
@@ -16,6 +20,9 @@ class UserSettingsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final themeProvider = context.watch<ThemeProvider>();
     final auth = context.watch<AuthProvider>();
+    final cities = context.watch<CitiesProvider>().activeCities;
+    final cityPrefs = context.watch<CityPreferencesProvider>();
+    final languageCode = context.locale.languageCode;
 
     return Scaffold(
       appBar: AppBar(title: Text('settings.title'.tr())),
@@ -46,6 +53,36 @@ class UserSettingsScreen extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 12),
+          _SectionLabel(label: 'settings.myCities'.tr()),
+          ListTile(
+            leading: Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: AppColors.primary.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: const Icon(Icons.location_city_rounded, color: AppColors.primary),
+            ),
+            title: Text('settings.myCities'.tr()),
+            subtitle: Text(
+              cities.isEmpty
+                  ? 'settings.myCitiesEmpty'.tr()
+                  : cityPrefs.preferredCityIds.isEmpty
+                      ? 'settings.myCitiesSubtitle'.tr()
+                      : cities
+                          .where((c) => cityPrefs.preferredCityIds.contains(c.id))
+                          .map((c) => c.localizedName(languageCode))
+                          .join(', '),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) => const CitySelectionScreen()),
+            ),
+          ),
+          const SizedBox(height: 12),
           _SectionLabel(label: 'settings.appearance'.tr()),
           // RadioListTile's own groupValue/onChanged were deprecated in
           // favor of an ancestor RadioGroup, which now owns the selection
@@ -72,27 +109,41 @@ class UserSettingsScreen extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           _SectionLabel(label: 'settings.administration'.tr()),
-          ListTile(
-            leading: Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(
-                color: AppColors.primary.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(10),
+          if (auth.isAdmin) ...[
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+              child: Text(
+                'settings.adminAccessSubtitle'.tr(),
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                    ),
               ),
-              child: const Icon(Icons.admin_panel_settings_outlined, color: AppColors.primary),
             ),
-            title: Text('settings.loginAsAdmin'.tr()),
-            subtitle: Text('settings.loginAsAdminSubtitle'.tr()),
-            trailing: const Icon(Icons.chevron_right),
-            onTap: () {
-              if (auth.isAdmin) {
-                context.push(AppRoutes.adminHome);
-              } else {
-                context.push(AppRoutes.adminLogin);
-              }
-            },
-          ),
+            const SizedBox(height: 8),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: ModeToggle(
+                isAdminMode: false,
+                onAdminMode: () => context.push(AppRoutes.adminHome),
+                onUserMode: () {},
+              ),
+            ),
+          ] else
+            ListTile(
+              leading: Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: const Icon(Icons.admin_panel_settings_outlined, color: AppColors.primary),
+              ),
+              title: Text('settings.loginAsAdmin'.tr()),
+              subtitle: Text('settings.loginAsAdminSubtitle'.tr()),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => context.push(AppRoutes.adminLogin),
+            ),
           const SizedBox(height: 12),
           _SectionLabel(label: 'settings.about'.tr()),
           const _AppVersionTile(),

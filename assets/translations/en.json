@@ -1,7 +1,26 @@
 {
   "app": {
-    "name": "Poultry Rates",
+    "name": "Poultry Hub",
     "tagline": "Fresh rates, every city, every day"
+  },
+  "onboarding": {
+    "title": "Which cities interest you?",
+    "subtitle": "Pick the cities you want to follow — they'll show first on the Rates tab and you'll get notified when their rates change.",
+    "continue": "Continue",
+    "skip": "Skip for now"
+  },
+  "languageSelect": {
+    "title": "Choose your language",
+    "subtitle": "You can always change this later in Settings."
+  },
+  "welcome": {
+    "title": "Welcome to Poultry Hub",
+    "subtitle": "Get daily chicken, meat and egg rates for your city, straight from trusted local sources."
+  },
+  "forceUpdate": {
+    "title": "Update Required",
+    "subtitle": "A newer version of the app is available and this version can no longer be used. Please update to continue.",
+    "updateNow": "Update Now"
   },
   "auth": {
     "adminLoginTitle": "Admin Login",
@@ -17,6 +36,7 @@
     "enterFullCode": "Please enter the full 6-digit code",
     "invalidCode": "That code isn't right. Please try again.",
     "notAuthorized": "This phone number is not authorized for admin access.",
+    "codeExpiredResend": "This code has expired. Please request a new one.",
     "resendIn": "Resend code in {}s",
     "resendCode": "Resend Code"
   },
@@ -35,7 +55,10 @@
     "city": "City",
     "delete": "Delete",
     "edit": "Edit",
-    "save": "Save"
+    "save": "Save",
+    "errorLoadingTitle": "Couldn't load this",
+    "errorLoadingSubtitle": "Something went wrong loading data. Pull to retry.",
+    "retry": "Retry"
   },
   "nav": {
     "feed": "Feed",
@@ -46,7 +69,17 @@
   "feed": {
     "title": "News Feed",
     "emptyTitle": "No news yet",
-    "emptySubtitle": "Check back soon for the latest poultry market updates."
+    "emptySubtitle": "Check back soon for the latest poultry market updates.",
+    "add": "Add Post",
+    "addTitle": "Add Post",
+    "editTitle": "Edit Post",
+    "titleEnglish": "Title (English)",
+    "titleUrdu": "Title (Urdu)",
+    "bodyEnglish": "Body (English)",
+    "bodyUrdu": "Body (Urdu)",
+    "imageUrl": "Image URL (optional)",
+    "deleteTitle": "Delete this post?",
+    "deleteMessage": "This news post will be permanently removed."
   },
   "rates": {
     "title": "Today's Rates",
@@ -59,7 +92,18 @@
     "deleteMessage": "This entry will be permanently removed from the price history.",
     "emptyTitle": "No rates yet",
     "emptySubtitle": "Rates added by the admin will show up here.",
-    "manageTitle": "Manage Rates"
+    "manageTitle": "Manage Rates",
+    "loadOlder": "Load older rates",
+    "noOlderRates": "That's all the history we have",
+    "searchHint": "Search by city…",
+    "myCitiesOption": "My Cities",
+    "allCitiesOption": "All Cities",
+    "otherCities": "Other cities",
+    "noFollowedCitiesTitle": "You're not following any cities yet",
+    "noFollowedCitiesSubtitle": "Pick cities in Settings > My Cities to see their rates here.",
+    "changeCitiesOption": "Change Cities",
+    "editMyCities": "Edit my cities",
+    "notSetYet": "Not set yet"
   },
   "graphs": {
     "title": "Price Trends",
@@ -70,6 +114,9 @@
   "settings": {
     "title": "Settings",
     "language": "Language",
+    "myCities": "My Cities",
+    "myCitiesSubtitle": "Followed cities appear first on the Rates tab and you'll be notified when their rates change.",
+    "myCitiesEmpty": "No cities available yet.",
     "appearance": "Appearance",
     "systemDefault": "System default",
     "light": "Light",
@@ -77,18 +124,38 @@
     "administration": "Administration",
     "loginAsAdmin": "Login as Admin",
     "loginAsAdminSubtitle": "Manage cities, rates and view app users",
+    "adminAccessSubtitle": "You're signed in as admin. Switch modes anytime.",
     "about": "About",
     "appVersion": "App version"
+  },
+  "modeToggle": {
+    "adminMode": "Admin Mode",
+    "userMode": "User Mode"
   },
   "admin": {
     "dashboard": "Dashboard",
     "cities": "Cities",
     "rates": "Rates",
+    "feed": "Feed",
     "users": "Users",
     "backToApp": "Back to app",
     "logout": "Logout",
     "logoutTitle": "Logout of Admin?",
     "logoutMessage": "You'll need to verify your phone number again to access the admin panel."
+  },
+  "appContent": {
+    "title": "App Content",
+    "saved": "Saved",
+    "welcomeSection": "Welcome screen",
+    "welcomeSectionSubtitle": "Shown once, the first time someone opens the app.",
+    "welcomeTitleEnglish": "Welcome title (English)",
+    "welcomeTitleUrdu": "Welcome title (Urdu)",
+    "welcomeMessageEnglish": "Welcome message (English)",
+    "welcomeMessageUrdu": "Welcome message (Urdu)",
+    "citySection": "City selection screen",
+    "citySectionSubtitle": "Shown above the city picker during first-launch onboarding.",
+    "cityDescriptionEnglish": "Description (English)",
+    "cityDescriptionUrdu": "Description (Urdu)"
   },
   "cities": {
     "add": "Add City",
@@ -106,7 +173,11 @@
   "dashboard": {
     "noCitiesTitle": "No cities yet",
     "noCitiesSubtitle": "Add a city from the Cities tab to start publishing today's rates.",
-    "noRateYet": "Not set"
+    "noRateYet": "Not set",
+    "searchHint": "Search cities…",
+    "noSearchResultsTitle": "No matching cities",
+    "noSearchResultsSubtitle": "Try a different search term.",
+    "pendingToday": "Pending today"
   },
   "users": {
     "totalUsers": "Total Users",

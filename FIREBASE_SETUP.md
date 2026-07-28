@@ -98,3 +98,56 @@ see it fully populated, add via the console:
 Once a city exists, use the admin Dashboard tab to add chicken/meat/egg
 rates for it — every save creates a new price-history entry, which is
 what powers the trend graphs in the user app.
+
+## 8. Push notifications (Cloud Functions)
+
+Users pick which cities to follow (on first launch, and any time after in
+Settings > My Cities). When an admin saves a new rate for a followed city,
+everyone following it gets a push notification. This is driven by a Cloud
+Function (`functions/`) that triggers on every new `rates` document.
+
+**This requires the Blaze (pay-as-you-go) plan** — Cloud Functions with
+Firestore triggers aren't available on the free Spark plan. Blaze still has
+a generous free tier (2M function invocations/month); for an app this size
+you're extremely unlikely to be charged anything. Upgrade at
+**Firebase console > (bottom left) Upgrade project**.
+
+Once you're on Blaze:
+
+```bash
+cd functions && npm install
+cd ..
+firebase deploy --only functions
+```
+
+That deploys two functions:
+
+1. **`notifyOnRateCreated`** — watches `rates/{rateId}` for new documents,
+   looks up which users have that rate's `cityId` in their
+   `preferredCityIds` array, and pushes to their registered `fcmToken`s.
+2. **`syncCurrentRateOnWrite`** — keeps a small `currentRates` collection
+   (one doc per city+category) pointed at whichever `rates` entry is
+   currently newest. The app reads `currentRates` instead of scanning the
+   full `rates` history to figure out "today's price" — important once you
+   have real usage, since the old approach's read cost grew without bound
+   as price history piled up.
+
+**One-time step after your first deploy:** `syncCurrentRateOnWrite` only
+keeps `currentRates` in sync for writes that happen *after* it's deployed.
+Backfill it once from whatever's already in `rates`:
+
+```bash
+cd functions
+gcloud auth application-default login   # if you haven't already
+node scripts/backfill-current-rates.js
+```
+
+Safe to re-run if needed — it just recomputes and overwrites.
+
+No further console setup is needed for Android — Firebase Cloud Messaging
+works automatically once google-services.json is in place. **For iOS**,
+push notifications need an APNs authentication key uploaded under
+**Project settings > Cloud Messaging** (the same key from step 4 covers
+both phone-auth silent push and regular notifications), plus the "Push
+Notifications" and "Background Modes > Remote notifications" capabilities
+enabled in Xcode for the Runner target.

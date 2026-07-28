@@ -62,6 +62,37 @@ class _AdminOtpScreenState extends State<AdminOtpScreen> {
 
   String get _code => _controllers.map((c) => c.text).join();
 
+  void _clearCode() {
+    for (final c in _controllers) {
+      c.clear();
+    }
+    _nodes.first.requestFocus();
+  }
+
+  /// Spreads a multi-digit string (from SMS autofill or a manual paste)
+  /// across the OTP boxes starting at [startIndex], filling forward and
+  /// clearing anything left over in later boxes.
+  void _distributeCode(String digits, int startIndex) {
+    var remaining = digits;
+    var i = startIndex;
+    while (i < AppConstants.otpLength && remaining.isNotEmpty) {
+      _controllers[i].text = remaining.substring(0, 1);
+      _controllers[i].selection = const TextSelection.collapsed(offset: 1);
+      remaining = remaining.substring(1);
+      i++;
+    }
+    for (var j = i; j < AppConstants.otpLength; j++) {
+      _controllers[j].clear();
+    }
+
+    final nextFocus = i < AppConstants.otpLength ? i : AppConstants.otpLength - 1;
+    _nodes[nextFocus].requestFocus();
+    if (_code.length == AppConstants.otpLength) {
+      FocusScope.of(context).unfocus();
+    }
+    setState(() {});
+  }
+
   Future<void> _verify() async {
     if (_code.length != AppConstants.otpLength) {
       setState(() => _error = 'auth.enterFullCode');
@@ -73,6 +104,20 @@ class _AdminOtpScreenState extends State<AdminOtpScreen> {
     });
 
     final auth = context.read<AuthProvider>();
+
+    // A previous failed attempt (wrong code, expired session, or
+    // not-authorized) invalidates the verification session — the provider
+    // clears it in that case. Rather than silently no-op, send the user
+    // straight to requesting a fresh code.
+    if (auth.pendingVerificationExpired) {
+      setState(() {
+        _submitting = false;
+        _error = 'auth.codeExpiredResend';
+      });
+      _clearCode();
+      return;
+    }
+
     final success = await auth.confirmOtp(_code);
 
     if (!mounted) return;
@@ -82,6 +127,7 @@ class _AdminOtpScreenState extends State<AdminOtpScreen> {
       context.go(AppRoutes.adminHome);
     } else {
       setState(() => _error = auth.errorMessage ?? 'auth.invalidCode');
+      _clearCode();
     }
   }
 
@@ -124,20 +170,51 @@ class _AdminOtpScreenState extends State<AdminOtpScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: List.generate(AppConstants.otpLength, (index) {
                   return SizedBox(
-                    width: 44,
+                    width: 46,
+                    height: 56,
                     child: TextField(
                       controller: _controllers[index],
                       focusNode: _nodes[index],
                       textAlign: TextAlign.center,
+                      textAlignVertical: TextAlignVertical.center,
                       keyboardType: TextInputType.number,
-                      maxLength: 1,
+                      // No maxLength here on purpose: Android's SMS-code
+                      // autofill/paste drops the whole 6-digit code into a
+                      // single box. Capping length to 1 truncates that
+                      // paste before we ever see it, so we accept the full
+                      // string and redistribute it across the boxes below.
                       style: theme.textTheme.titleLarge,
                       inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                      decoration: const InputDecoration(counterText: ''),
+                      decoration: const InputDecoration(
+                        counterText: '',
+                        isDense: true,
+                        contentPadding: EdgeInsets.zero,
+                      ),
+                      onTap: () {
+                        // Select any existing digit so typing overwrites it
+                        // instead of appending and overflowing the box.
+                        _controllers[index].selection = TextSelection(
+                          baseOffset: 0,
+                          extentOffset: _controllers[index].text.length,
+                        );
+                      },
                       onChanged: (value) {
-                        if (value.isNotEmpty && index < AppConstants.otpLength - 1) {
+                        final digits = value.replaceAll(RegExp(r'[^0-9]'), '');
+
+                        if (digits.length > 1) {
+                          _distributeCode(digits, index);
+                          return;
+                        }
+
+                        if (_controllers[index].text != digits) {
+                          _controllers[index].text = digits;
+                          _controllers[index].selection =
+                              TextSelection.collapsed(offset: digits.length);
+                        }
+
+                        if (digits.isNotEmpty && index < AppConstants.otpLength - 1) {
                           _nodes[index + 1].requestFocus();
-                        } else if (value.isEmpty && index > 0) {
+                        } else if (digits.isEmpty && index > 0) {
                           _nodes[index - 1].requestFocus();
                         }
                         if (_code.length == AppConstants.otpLength) {

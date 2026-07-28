@@ -14,7 +14,7 @@ class PoultryRatesApp extends StatelessWidget {
     final languageCode = context.locale.languageCode;
 
     return MaterialApp.router(
-      title: 'Poultry Rates',
+      title: 'Poultry Hub',
       debugShowCheckedModeBanner: false,
       routerConfig: appRouter,
       themeMode: themeMode,

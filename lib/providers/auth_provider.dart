@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import '../models/app_user_model.dart';
 import '../services/auth_service.dart';
 import '../services/firestore_service.dart';
+import '../services/notification_service.dart';
 
 enum AdminAuthStatus { unknown, signedOut, codeSent, verifying, authorized, notAuthorized }
 
@@ -14,8 +15,9 @@ enum AdminAuthStatus { unknown, signedOut, codeSent, verifying, authorized, notA
 class AuthProvider extends ChangeNotifier {
   final AuthService _authService;
   final FirestoreService _firestoreService;
+  final NotificationService _notificationService;
 
-  AuthProvider(this._authService, this._firestoreService) {
+  AuthProvider(this._authService, this._firestoreService, this._notificationService) {
     _authService.authStateChanges.listen(_onAuthStateChanged);
   }
 
@@ -27,6 +29,12 @@ class AuthProvider extends ChangeNotifier {
   String? pendingPhoneNumber;
 
   User? get firebaseUser => _authService.currentUser;
+
+  /// True once a previous verify attempt spent the current verification
+  /// session (wrong code, expired, or failed the admin allow-list check).
+  /// The OTP screen should force a resend rather than letting the user
+  /// retry with a dead session.
+  bool get pendingVerificationExpired => _verificationId == null;
 
   Future<void> _onAuthStateChanged(User? user) async {
     if (user == null) {
@@ -55,6 +63,11 @@ class AuthProvider extends ChangeNotifier {
       ),
     );
 
+    // Registers/refreshes this device's FCM token against the now-known
+    // uid. Also fire-and-forget: notifications are a nice-to-have and
+    // should never block sign-in.
+    unawaited(_notificationService.initialize(user.uid));
+
     notifyListeners();
   }
 
@@ -66,6 +79,13 @@ class AuthProvider extends ChangeNotifier {
     pendingPhoneNumber = e164Phone;
     notifyListeners();
 
+    // verifyPhoneNumber's own Future completes as soon as the request is
+    // dispatched — well before the codeSent callback fires. Callers need to
+    // know once we've actually reached a terminal state (code sent, failed,
+    // or auto-verified), so we bridge that with a Completer instead of
+    // relying on the outer await below.
+    final completer = Completer<void>();
+
     await _authService.sendOtp(
       phoneNumber: e164Phone,
       forceResendingToken: _resendToken,
@@ -74,11 +94,13 @@ class AuthProvider extends ChangeNotifier {
         _resendToken = resendToken;
         status = AdminAuthStatus.codeSent;
         notifyListeners();
+        if (!completer.isCompleted) completer.complete();
       },
       onFailed: (e) {
         errorMessage = e.message ?? 'auth.otpFailed';
         status = AdminAuthStatus.signedOut;
         notifyListeners();
+        if (!completer.isCompleted) completer.complete();
       },
       onAutoVerified: (credential) async {
         try {
@@ -89,6 +111,20 @@ class AuthProvider extends ChangeNotifier {
         } catch (_) {
           // Auto-verification without manual code entry can fail silently on
           // some devices — the user can still enter the code manually.
+        }
+        if (!completer.isCompleted) completer.complete();
+      },
+    );
+
+    // Safety net: if none of the callbacks fire (shouldn't normally happen,
+    // but avoids hanging forever if a platform quirk swallows them).
+    await completer.future.timeout(
+      const Duration(seconds: 65),
+      onTimeout: () {
+        if (status == AdminAuthStatus.verifying) {
+          errorMessage = 'auth.otpFailed';
+          status = AdminAuthStatus.signedOut;
+          notifyListeners();
         }
       },
     );
@@ -118,12 +154,21 @@ class AuthProvider extends ChangeNotifier {
         errorMessage = 'auth.notAuthorized';
         await _authService.signOut();
         await _authService.ensureAnonymousSession();
+        // The phone-auth credential is single-use — it's now spent whether
+        // or not the allow-list check passed. Clear it so a retry can't
+        // silently resubmit a dead session (which surfaces as a confusing
+        // "code expired" error); the user must request a new code instead.
+        _verificationId = null;
         notifyListeners();
         return false;
       }
     } on FirebaseAuthException catch (e) {
       status = AdminAuthStatus.signedOut;
       errorMessage = e.message ?? 'auth.invalidCode';
+      // Same reasoning as above: whatever caused this (wrong code, expired
+      // session, already-used credential), the verificationId in hand is no
+      // longer good. Force a resend rather than letting a retry reuse it.
+      _verificationId = null;
       notifyListeners();
       return false;
     }

@@ -20,11 +20,25 @@ class AuthService {
 
   /// Signs regular (non-admin) users in anonymously so the admin can see
   /// aggregate usage in the "Users" screen. Silent — no UI is shown.
+  ///
+  /// Once a device has signed in anonymously at least once, Firebase Auth
+  /// caches that session locally and [_auth.currentUser] is non-null on
+  /// every later launch — network or not. It's only a *first* launch with
+  /// no connectivity that reaches the network call below, and that call
+  /// must never be allowed to block app startup: bounded by a short
+  /// timeout and never throws, so a splash screen awaiting this always
+  /// moves on. The rest of the app treats "no user yet" the same as
+  /// "anonymous, not admin", and a session is established the next time
+  /// this runs with connectivity.
   Future<User?> ensureAnonymousSession() async {
     final existing = _auth.currentUser;
     if (existing != null) return existing;
-    final credential = await _auth.signInAnonymously();
-    return credential.user;
+    try {
+      final credential = await _auth.signInAnonymously().timeout(const Duration(seconds: 8));
+      return credential.user;
+    } catch (_) {
+      return null;
+    }
   }
 
   Future<void> sendOtp({
