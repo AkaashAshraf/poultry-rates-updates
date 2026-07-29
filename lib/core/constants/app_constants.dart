@@ -7,9 +7,14 @@ class FirestoreCollections {
 
   static const String cities = 'cities';
   static const String rates = 'rates';
+  static const String currentRates = 'currentRates';
   static const String news = 'news';
   static const String users = 'users';
   static const String admins = 'admins';
+  // Two fixed docs live here: 'onboarding' (welcome/city-selection copy,
+  // admin-editable) and 'version' (force-update gate, developer-edited via
+  // the Firestore console — see AppVersionConfig).
+  static const String appConfig = 'appConfig';
 }
 
 /// The three rate categories the app tracks.
@@ -67,9 +72,11 @@ extension RateCategoryX on RateCategory {
 class AppConstants {
   AppConstants._();
 
-  static const String appName = 'Poultry Rates';
+  static const String appName = 'Poultry Hub';
   static const String prefsLocaleKey = 'app_locale';
   static const String prefsThemeKey = 'app_theme_mode';
+  static const String prefsPreferredCitiesKey = 'preferred_city_ids';
+  static const String prefsOnboardedKey = 'has_completed_city_onboarding';
   static const int otpLength = 6;
   static const int otpResendSeconds = 60;
 }

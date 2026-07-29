@@ -63,6 +63,7 @@ class _ManageRatesScreenState extends State<ManageRatesScreen> with SingleTicker
         ),
       ),
       floatingActionButton: FloatingActionButton.extended(
+        heroTag: 'manageRatesFab',
         onPressed: () => showRateFormSheet(context, category: _currentCategory),
         icon: const Icon(Icons.add),
         label: Text('rates.add'.tr()),
@@ -85,6 +86,14 @@ class _RateHistoryList extends StatefulWidget {
 
 class _RateHistoryListState extends State<_RateHistoryList> {
   String? _cityFilter;
+  final _searchController = TextEditingController();
+  String _query = '';
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -96,6 +105,27 @@ class _RateHistoryListState extends State<_RateHistoryList> {
       children: [
         Padding(
           padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+          child: TextField(
+            controller: _searchController,
+            onChanged: (value) => setState(() => _query = value),
+            decoration: InputDecoration(
+              hintText: 'rates.searchHint'.tr(),
+              prefixIcon: const Icon(Icons.search),
+              suffixIcon: _query.isEmpty
+                  ? null
+                  : IconButton(
+                      icon: const Icon(Icons.close),
+                      onPressed: () {
+                        _searchController.clear();
+                        setState(() => _query = '');
+                      },
+                    ),
+              isDense: true,
+            ),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 10, 16, 0),
           child: SizedBox(
             height: 40,
             child: ListView(
@@ -126,15 +156,40 @@ class _RateHistoryListState extends State<_RateHistoryList> {
           child: StreamBuilder<List<RateModel>>(
             stream: firestore.watchAllRatesForCategory(widget.category, cityId: _cityFilter),
             builder: (context, snapshot) {
+              if (snapshot.hasError) {
+                // Common cause: Firestore needs a composite index for this
+                // category+city+date query and it hasn't finished building
+                // yet. Logged so the exact error (with the console link, if
+                // that's the cause) is visible while debugging.
+                debugPrint('watchAllRatesForCategory error: ${snapshot.error}');
+                return EmptyState(
+                  icon: Icons.error_outline,
+                  titleKey: 'common.errorLoadingTitle',
+                  subtitleKey: 'common.errorLoadingSubtitle',
+                  action: FilledButton(
+                    onPressed: () => setState(() {}),
+                    child: Text('common.retry'.tr()),
+                  ),
+                );
+              }
               if (!snapshot.hasData) {
                 return const Center(child: CircularProgressIndicator());
               }
-              final rates = snapshot.data!;
+              var rates = snapshot.data!;
+              final query = _query.trim().toLowerCase();
+              if (query.isNotEmpty) {
+                rates = rates
+                    .where((r) =>
+                        r.cityNameEn.toLowerCase().contains(query) ||
+                        r.cityNameUr.toLowerCase().contains(query))
+                    .toList();
+              }
               if (rates.isEmpty) {
                 return EmptyState(
-                  icon: widget.category.icon,
-                  titleKey: 'rates.emptyTitle',
-                  subtitleKey: 'rates.emptySubtitle',
+                  icon: query.isEmpty ? widget.category.icon : Icons.search_off,
+                  titleKey: query.isEmpty ? 'rates.emptyTitle' : 'dashboard.noSearchResultsTitle',
+                  subtitleKey:
+                      query.isEmpty ? 'rates.emptySubtitle' : 'dashboard.noSearchResultsSubtitle',
                 );
               }
               return ListView.separated(

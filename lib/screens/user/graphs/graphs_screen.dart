@@ -80,6 +80,18 @@ class _GraphsScreenState extends State<GraphsScreen> {
                 : StreamBuilder<List<RateModel>>(
                     stream: firestore.watchRateHistory(category: _category, cityId: _cityId!),
                     builder: (context, snapshot) {
+                      if (snapshot.hasError) {
+                        debugPrint('watchRateHistory error: ${snapshot.error}');
+                        return EmptyState(
+                          icon: Icons.error_outline,
+                          titleKey: 'common.errorLoadingTitle',
+                          subtitleKey: 'common.errorLoadingSubtitle',
+                          action: FilledButton(
+                            onPressed: () => setState(() {}),
+                            child: Text('common.retry'.tr()),
+                          ),
+                        );
+                      }
                       if (!snapshot.hasData) {
                         return const Center(child: CircularProgressIndicator());
                       }

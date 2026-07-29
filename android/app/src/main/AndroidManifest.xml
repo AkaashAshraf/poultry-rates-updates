@@ -1,10 +1,27 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <uses-permission android:name="android.permission.INTERNET"/>
+    <!-- Required on Android 13+ for the runtime notification permission
+         prompt (triggered by firebase_messaging's requestPermission call)
+         to actually work. -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
 
     <application
-        android:label="Poultry Rates"
+        android:label="Poultry Hub"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
+        <!-- Default icon/color for FCM notifications shown while the app
+             is backgrounded or terminated (no dedicated notification icon
+             asset yet, so this reuses the launcher icon). -->
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_icon"
+            android:resource="@mipmap/ic_launcher" />
+        <!-- AdMob requires this or the app crashes on launch. This is
+             Google's public TEST application ID — replace with your real
+             AdMob Android app ID before release (see
+             lib/core/constants/ad_constants.dart for the full checklist). -->
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-3940256099942544~3347511713" />
         <activity
             android:name=".MainActivity"
             android:exported="true"

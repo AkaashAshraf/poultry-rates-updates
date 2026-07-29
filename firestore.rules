@@ -12,6 +12,14 @@ rules_version = '2';
 // - users: each visitor may create/update only their own document; the
 //   whole collection is readable by any admin (checked via the allow-list)
 //   so the admin "Users" screen can list everyone.
+// - appConfig: two fixed docs (`onboarding`, `version`) read by every
+//   client on startup — see fetchOnboardingContent/fetchVersionConfig in
+//   firestore_service.dart. Public read like cities/rates/news. `version`
+//   in particular is meant to be hand-edited by the developer from the
+//   Firebase console (see AppVersionConfig's doc comment) rather than from
+//   an admin UI, but console/Admin SDK writes aren't subject to these
+//   rules anyway — allow-listing isAdmin() here just also lets it be
+//   managed from the app later without a rules change.
 
 function isSignedIn() {
   return request.auth != null;
@@ -36,7 +44,23 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
+    // One doc per city+category holding just the latest price — kept in
+    // sync by the syncCurrentRateOnWrite Cloud Function whenever a `rates`
+    // doc is created/edited/deleted. This exists purely so "what's the
+    // current rate" queries don't have to scan the entire (ever-growing)
+    // `rates` history — see functions/index.js for why. Never written to
+    // directly by clients.
+    match /currentRates/{docId} {
+      allow read: if true;
+      allow write: if false;
+    }
+
     match /news/{newsId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /appConfig/{docId} {
       allow read: if true;
       allow write: if isAdmin();
     }

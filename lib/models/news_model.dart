@@ -33,4 +33,15 @@ class NewsModel {
       createdAt: (map['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
     );
   }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'titleEn': titleEn,
+      'titleUr': titleUr,
+      'bodyEn': bodyEn,
+      'bodyUr': bodyUr,
+      if (imageUrl != null && imageUrl!.isNotEmpty) 'imageUrl': imageUrl,
+      'createdAt': Timestamp.fromDate(createdAt),
+    };
+  }
 }

@@ -1,7 +1,7 @@
 name: poultry_rates_app
 description: "Daily poultry rates (chicken, meat, eggs) by city — with an admin panel and bilingual (English/Urdu) support."
 publish_to: 'none'
-version: 1.0.0+1
+version: 1.0.0+10
 
 environment:
   # Pinned to match the Flutter version fixed in .fvmrc (3.44.7, which
@@ -20,6 +20,7 @@ dependencies:
   firebase_core: ^3.6.0
   firebase_auth: ^5.3.1
   cloud_firestore: ^5.4.4
+  firebase_messaging: ^15.1.3
 
   # State management
   provider: ^6.1.2
@@ -43,6 +44,16 @@ dependencies:
   shared_preferences: ^2.3.2
   intl_phone_field: ^3.2.0
   package_info_plus: ^8.1.0
+  # Opens the Play Store / App Store listing from the force-update screen.
+  url_launcher: ^6.3.1
+
+  # Ads
+  # Pinned to >=8.0.0: older releases (including 5.x) ship a Groovy
+  # build.gradle that's incompatible with this project's Gradle 9.1.0 / AGP
+  # 9.0.1 toolchain (throws "unknown property 'all' for configuration
+  # container" during Gradle configuration). 8.0.0+ rewrote the plugin's
+  # Android build script to work with modern AGP.
+  google_mobile_ads: ^9.0.0
 
 dev_dependencies:
   flutter_test:
@@ -54,3 +65,4 @@ flutter:
 
   assets:
     - assets/translations/
+    - assets/images/

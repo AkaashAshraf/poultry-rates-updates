@@ -6,8 +6,11 @@ import 'package:provider/provider.dart';
 import '../../../core/routing/app_router.dart';
 import '../../../providers/auth_provider.dart';
 import '../../../widgets/confirm_dialog.dart';
+import '../../../widgets/mode_toggle.dart';
 import '../cities/manage_cities_screen.dart';
+import '../content/app_content_screen.dart';
 import '../dashboard/admin_dashboard_screen.dart';
+import '../news/manage_news_screen.dart';
 import '../rates/manage_rates_screen.dart';
 import '../users/admin_users_screen.dart';
 
@@ -27,6 +30,7 @@ class _AdminShellScreenState extends State<AdminShellScreen> {
     AdminDashboardScreen(),
     ManageCitiesScreen(),
     ManageRatesScreen(),
+    ManageNewsScreen(),
     AdminUsersScreen(),
   ];
 
@@ -34,6 +38,7 @@ class _AdminShellScreenState extends State<AdminShellScreen> {
     'admin.dashboard',
     'admin.cities',
     'admin.rates',
+    'admin.feed',
     'admin.users',
   ];
 
@@ -59,18 +64,32 @@ class _AdminShellScreenState extends State<AdminShellScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(_titles[_index].tr()),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          tooltip: 'admin.backToApp'.tr(),
-          onPressed: () => context.go(AppRoutes.userHome),
-        ),
+        automaticallyImplyLeading: false,
         actions: [
+          IconButton(
+            icon: const Icon(Icons.edit_note_outlined),
+            tooltip: 'appContent.title'.tr(),
+            onPressed: () => Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) => const AppContentScreen()),
+            ),
+          ),
           IconButton(
             icon: const Icon(Icons.logout),
             tooltip: 'admin.logout'.tr(),
             onPressed: _logout,
           ),
         ],
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(56),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+            child: ModeToggle(
+              isAdminMode: true,
+              onAdminMode: () {},
+              onUserMode: () => context.go(AppRoutes.userHome),
+            ),
+          ),
+        ),
       ),
       body: IndexedStack(index: _index, children: _screens),
       bottomNavigationBar: NavigationBar(
@@ -91,6 +110,11 @@ class _AdminShellScreenState extends State<AdminShellScreen> {
             icon: const Icon(Icons.storefront_outlined),
             selectedIcon: const Icon(Icons.storefront),
             label: 'admin.rates'.tr(),
+          ),
+          NavigationDestination(
+            icon: const Icon(Icons.dynamic_feed_outlined),
+            selectedIcon: const Icon(Icons.dynamic_feed),
+            label: 'admin.feed'.tr(),
           ),
           NavigationDestination(
             icon: const Icon(Icons.people_outline),
