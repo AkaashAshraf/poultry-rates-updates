@@ -1,14 +1,14 @@
 name: poultry_rates_app
 description: "Daily poultry rates (chicken, meat, eggs) by city — with an admin panel and bilingual (English/Urdu) support."
-publish_to: 'none'
-version: 1.0.0+10
+publish_to: "none"
+version: 1.0.0+11
 
 environment:
   # Pinned to match the Flutter version fixed in .fvmrc (3.44.7, which
   # bundles Dart 3.12). Run `fvm use` before `fvm flutter pub get` so the
   # SDK actually on disk matches these constraints.
-  sdk: '>=3.12.0 <4.0.0'
-  flutter: '>=3.44.0'
+  sdk: ">=3.12.0 <4.0.0"
+  flutter: ">=3.44.0"
 
 dependencies:
   flutter:
